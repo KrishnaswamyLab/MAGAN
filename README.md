@@ -1,4 +1,4 @@
-#MAGAN: Manifold Aligning Generative Adversarial Network
+# MAGAN: Manifold Aligning Generative Adversarial Network
 Code for MAGAN ([https://arxiv.org/abs/1803.00385])
 
 Run the toy example with:

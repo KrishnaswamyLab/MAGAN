@@ -25,10 +25,9 @@ class MAGAN(object):
         dim_b1,
         dim_b2,
         activation=lrelu,
-        batch_size=1,
         learning_rate=.001,
         restore_folder='',
-        limit_gpu_fraction=.25,
+        limit_gpu_fraction=1.,
         no_gpu=False,
         nfilt=64):
         """Initialize the model."""
@@ -37,7 +36,6 @@ class MAGAN(object):
         self.activation = activation
         self.learning_rate = learning_rate
         self.iteration = 0
-        self.batch_size = batch_size
 
         if restore_folder:
             self._restore(restore_folder)
@@ -97,30 +95,30 @@ class MAGAN(object):
 
     def _build(self):
         """Construct the DiscoGAN operations."""
-        self.G12 = Generator(self.dim_b1, self.dim_b2, name='G12')
-        self.Gb2 = self.G12(self.xb1, is_training=self.is_training)
+        self.G12 = Generator(self.dim_b2, name='G12')
+        self.Gb2 = self.G12(self.xb1)
         self.Gb2 = nameop(self.Gb2, 'Gb2')
 
-        self.G21 = Generator(self.dim_b2, self.dim_b1, name='G21')
-        self.Gb1 = self.G21(self.xb2, is_training=self.is_training)
+        self.G21 = Generator(self.dim_b1, name='G21')
+        self.Gb1 = self.G21(self.xb2)
         self.Gb1 = nameop(self.Gb1, 'Gb1')
 
-        self.xb2_reconstructed = self.G12(self.Gb1, is_training=self.is_training, reuse=True)
-        self.xb1_reconstructed = self.G21(self.Gb2, is_training=self.is_training, reuse=True)
+        self.xb2_reconstructed = self.G12(self.Gb1, reuse=True)
+        self.xb1_reconstructed = self.G21(self.Gb2, reuse=True)
         self.xb1_reconstructed = nameop(self.xb1_reconstructed, 'xb1_reconstructed')
         self.xb2_reconstructed = nameop(self.xb2_reconstructed, 'xb2_reconstructed')
 
-        self.D1 = Discriminator(self.dim_b1, name='D1')
-        self.D2 = Discriminator(self.dim_b2, name='D2')
+        self.D1 = Discriminator(name='D1')
+        self.D2 = Discriminator(name='D2')
 
-        self.D1_probs_z = self.D1(self.xb1, is_training=self.is_training)
-        self.D1_probs_G = self.D1(self.Gb1, is_training=self.is_training, reuse=True)
+        self.D1_probs_z = self.D1(self.xb1)
+        self.D1_probs_G = self.D1(self.Gb1, reuse=True)
 
-        self.D2_probs_z = self.D2(self.xb2, is_training=self.is_training)
-        self.D2_probs_G = self.D2(self.Gb2, is_training=self.is_training, reuse=True)
+        self.D2_probs_z = self.D2(self.xb2)
+        self.D2_probs_G = self.D2(self.Gb2, reuse=True)
 
-        self.D1_probs_xrecon = self.D2(self.xb1_reconstructed, is_training=self.is_training, reuse=True)
-        self.D2_probs_xrecon = self.D2(self.xb2_reconstructed, is_training=self.is_training, reuse=True)
+        self.D1_probs_xrecon = self.D2(self.xb1_reconstructed, reuse=True)
+        self.D2_probs_xrecon = self.D2(self.xb2_reconstructed, reuse=True)
 
         self._build_loss()
 
@@ -229,17 +227,15 @@ class Generator(object):
     """MAGAN's generator."""
 
     def __init__(self,
-        input_dim,
         output_dim,
         name='',
         activation=tf.nn.relu):
         """"Initialize the generator."""
-        self.input_dim = input_dim
         self.output_dim = output_dim
         self.activation = activation
         self.name = name
 
-    def __call__(self, x, is_training, reuse=False):
+    def __call__(self, x, reuse=False):
         """Perform the feedforward for the generator."""
         with tf.variable_scope(self.name):
             h1 = tf.layers.dense(x, 200, activation=self.activation, reuse=reuse, name='h1')
@@ -254,15 +250,13 @@ class Discriminator(object):
     """MAGAN's discriminator."""
 
     def __init__(self,
-        input_dim,
         name='',
         activation=tf.nn.relu):
         """Initialize the discriminator."""
-        self.input_dim = input_dim
         self.activation = activation
         self.name = name
 
-    def __call__(self, x, is_training, reuse=False):
+    def __call__(self, x, reuse=False):
         """Perform the feedforward for the discriminator."""
         with tf.variable_scope(self.name):
             h1 = tf.layers.dense(x, 800, activation=self.activation, reuse=reuse, name='h1')
