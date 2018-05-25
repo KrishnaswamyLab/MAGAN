@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 import matplotlib
 from utils import now
 from model import MAGAN
@@ -21,6 +22,22 @@ def get_data(n_batches=2, n_pts_per_cluster=5000):
 
     return xb1, xb2, labels1, labels2
 
+def correspondence_loss(b1, b2):
+    """
+    The correspondence loss.
+
+    :param b1: a tensor representing the object in the graph of the current minibatch from domain one
+    :param b2: a tensor representing the object in the graph of the current minibatch from domain two
+    :returns a scalar tensor of the correspondence loss
+    """
+    domain1cols = [0]
+    domain2cols = [0]
+    loss = tf.constant(0.)
+    for c1, c2 in zip(domain1cols, domain2cols):
+        loss += tf.reduce_mean((b1[:, c1] - b2[:, c2])**2)
+
+    return loss
+
 # Load the data
 xb1, xb2, labels1, labels2 = get_data()
 print("Batch 1 shape: {} Batch 2 shape: {}".format(xb1.shape, xb2.shape))
@@ -31,7 +48,7 @@ loadb2 = Loader(xb2, labels=labels2, shuffle=True)
 batch_size = 100
 
 # Build the tf graph
-magan = MAGAN(dim_b1=xb1.shape[1], dim_b2=xb2.shape[1], no_gpu=True)
+magan = MAGAN(dim_b1=xb1.shape[1], dim_b2=xb2.shape[1], correspondence_loss=correspondence_loss)
 
 # Train
 for i in range(1, 100000):

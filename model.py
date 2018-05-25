@@ -2,21 +2,7 @@ import tensorflow as tf
 import os
 from utils import lrelu, nameop, tbn, obn
 
-def correspondence_loss(b1, b2):
-    """
-    The correspondence loss.
 
-    :param b1: a tensor representing the object in the graph of the current minibatch from domain one
-    :param b2: a tensor representing the object in the graph of the current minibatch from domain two
-    :returns a scalar tensor of the correspondence loss
-    """
-    domain1cols = [0]
-    domain2cols = [0]
-    loss = tf.constant(0.)
-    for c1, c2 in zip(domain1cols, domain2cols):
-        loss += tf.reduce_mean((b1[:, c1] - b2[:, c2])**2)
-
-    return loss
 
 class MAGAN(object):
     """The MAGAN model."""
@@ -24,6 +10,7 @@ class MAGAN(object):
     def __init__(self,
         dim_b1,
         dim_b2,
+        correspondence_loss,
         activation=lrelu,
         learning_rate=.001,
         restore_folder='',
@@ -33,6 +20,7 @@ class MAGAN(object):
         """Initialize the model."""
         self.dim_b1 = dim_b1
         self.dim_b2 = dim_b2
+        self.correspondence_loss = correspondence_loss
         self.activation = activation
         self.learning_rate = learning_rate
         self.iteration = 0
@@ -157,8 +145,8 @@ class MAGAN(object):
         losses.append(tf.reduce_mean((self.xb1 - self.xb1_reconstructed)**2))
         losses.append(tf.reduce_mean((self.xb2 - self.xb2_reconstructed)**2))
         # correspondences losses
-        losses.append(1 * tf.reduce_mean(correspondence_loss(self.xb1, self.Gb2)))
-        losses.append(1 * tf.reduce_mean(correspondence_loss(self.xb2, self.Gb1)))
+        losses.append(1 * tf.reduce_mean(self.correspondence_loss(self.xb1, self.Gb2)))
+        losses.append(1 * tf.reduce_mean(self.correspondence_loss(self.xb2, self.Gb1)))
 
         self.loss_G = tf.reduce_mean(losses)
 
