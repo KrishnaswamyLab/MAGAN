@@ -3,7 +3,6 @@ import matplotlib
 from utils import now
 from model import MAGAN
 from loader import Loader
-matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import matplotlib.cm
 plt.ion(); fig = plt.figure()
