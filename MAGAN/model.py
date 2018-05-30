@@ -1,6 +1,6 @@
 import tensorflow as tf
 import os
-from utils import lrelu, nameop, tbn, obn
+from .utils import lrelu, nameop, tbn, obn
 
 
 
