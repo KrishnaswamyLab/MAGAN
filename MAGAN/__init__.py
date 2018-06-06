@@ -1,3 +1,2 @@
 from .model import MAGAN
-import loader
-import utils
+from .loader import Loader
