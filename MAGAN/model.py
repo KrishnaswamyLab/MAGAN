@@ -105,9 +105,6 @@ class MAGAN(object):
         self.D2_probs_z = self.D2(self.xb2)
         self.D2_probs_G = self.D2(self.Gb2, reuse=True)
 
-        self.D1_probs_xrecon = self.D2(self.xb1_reconstructed, reuse=True)
-        self.D2_probs_xrecon = self.D2(self.xb2_reconstructed, reuse=True)
-
         self._build_loss()
 
         self._build_optimization()
@@ -130,9 +127,6 @@ class MAGAN(object):
         # the generated examples
         losses.append(tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.D1_probs_G, labels=tf.zeros_like(self.D1_probs_G))))
         losses.append(tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.D2_probs_G, labels=tf.zeros_like(self.D2_probs_G))))
-        # the reconstructed examples
-        losses.append(tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.D1_probs_xrecon, labels=tf.ones_like(self.D1_probs_xrecon))))
-        losses.append(tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.D2_probs_xrecon, labels=tf.ones_like(self.D2_probs_xrecon))))
         self.loss_D = tf.reduce_mean(losses)
 
     def _build_loss_G(self):
