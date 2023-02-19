@@ -1,7 +1,8 @@
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import os
-from .utils import lrelu, nameop, tbn, obn
+from utils import lrelu, nameop, tbn, obn
 
+tf.compat.v1.disable_eager_execution()
 
 
 class MAGAN(object):

@@ -19,11 +19,11 @@ def nameop(op, name):
 
 def tbn(name):
     """Get a tensor of the given name from the graph."""
-    return tf.get_default_graph().get_tensor_by_name(name)
+    return tf.compat.v1.get_default_graph().get_tensor_by_name(name)
 
 def obn(name):
     """Get an object of the given name from the graph."""
-    return tf.get_default_graph().get_operation_by_name(name)
+    return tf.compat.v1.get_default_graph().get_operation_by_name(name)
 
 def get_all_node_names():
     """Get a list of all the node names in the current graph."""
