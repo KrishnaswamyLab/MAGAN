@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Loader(object):
     """A Loader class for feeding numpy matrices into tensorflow models."""
 
@@ -26,7 +27,9 @@ class Loader(object):
             self.epoch += 1
             batch_part1 = [x[self.start:] for x in self.data]
             batch_part2 = [x[:batch_size - (x.shape[0] - self.start)] for x in self.data]
-            batch = [np.concatenate([x1, x2], axis=0) for x1, x2 in zip(batch_part1, batch_part2)]
+            batch = [np.concatenate([x1, x2],
+                                    axis=0) for x1, x2 in zip(batch_part1,
+                                                              batch_part2)]
 
             self.start = batch_size - (num_rows - self.start)
 
@@ -61,31 +64,3 @@ class Loader(object):
                 yield [x[end:] for x in self.data][0]
             else:
                 yield [x[end:] for x in self.data]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

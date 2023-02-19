@@ -1,4 +1,15 @@
-sftp-config.json
+# Ignore Mac system files
+.DS_store
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
 *.pyc
+
+# Ignore virtual environment
+venv/
+
+#Analysis files
 analysis*
-.DS_STORE
+
+#SFTP Config JSON file
+sftp-config.json
