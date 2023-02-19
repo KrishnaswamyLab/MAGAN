@@ -51,7 +51,7 @@ batch_size = 100
 magan = MAGAN(dim_b1=xb1.shape[1], dim_b2=xb2.shape[1], correspondence_loss=correspondence_loss)
 
 # Train
-for i in range(1, 100000):
+for i in range(1, 3000):
     if i % 100 == 0: print("Iter {} ({})".format(i, now()))
     xb1_, labels1_ = loadb1.next_batch(batch_size)
     xb2_, labels2_ = loadb2.next_batch(batch_size)
